@@ -1,28 +1,13 @@
-# Compiled Object files
-*.slo
-*.lo
+#Binary files
 *.o
-*.obj
+*.build
+*FRCUserProgram
 
-# Precompiled Headers
-*.gch
-*.pch
-
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
-
-# Fortran module files
-*.mod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
-
-# Executables
-*.exe
-*.out
-*.app
+#Project files
+*.settings
+*.project
+*.cproject
+build.properties
+build.xml
+/Debug/
+sysProps.xml
