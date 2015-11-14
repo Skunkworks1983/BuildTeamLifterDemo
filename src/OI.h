@@ -12,29 +12,20 @@ public:
 
 	// How many buttons does a man need?
 
-	JoystickButton *canToCraaawTransfer;
-	JoystickButton *loadPos;
+	JoystickButton *highPos;
+	JoystickButton *midPos;
+	JoystickButton *lowPos;
 	JoystickButton *floorPos;
-	JoystickButton *moveArmsWhackMode;
-	JoystickButton *canArms;
-	JoystickButton *canCollectFwd;
-	JoystickButton *canCollectRvs;
-	JoystickButton *wristOverride;
-	JoystickButton *craaawToggle;
+
 	JoystickButton *scoreOverride;
 	JoystickButton *toteLifterUp;
 	JoystickButton *toteLifterDown;
 	JoystickButton *zeroLifter;
-	JoystickButton *canArmOverrideUp;
-	JoystickButton *canArmOverrideDown;
+
 	JoystickButton *toteLifterUpDriver;
 	JoystickButton *toteLifterDownDriver;
-	JoystickButton *wristToggleDriver;
-	JoystickButton *toggleCanBurgle;
 
 	AnalogRangeIOButton *score;
-	AnalogRangeIOButton *floorLoader;
-	AnalogRangeIOButton *carryPos;
 
 	OI();
 	~OI();

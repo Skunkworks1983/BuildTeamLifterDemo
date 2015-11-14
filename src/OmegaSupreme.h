@@ -13,6 +13,7 @@
 class OmegaSupreme: public IterativeRobot {
 private:
 	LiveWindow *lw;
+int counter;
 public:
 	OmegaSupreme();
 	~OmegaSupreme();

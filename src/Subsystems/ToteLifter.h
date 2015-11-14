@@ -14,11 +14,11 @@
  */
 class ToteLifter: public Subsystem, public PIDOutput, public PIDSource {
 private:
-	DigitalInput *elevatorInput, *craaawInput;
 	CANTalon *rightMotor, *leftMotor;
 	PIDController *pid;
 	Encoder *encoder;
 	bool dontUseMagOnPID;
+	double lastOutput;
 public:
 	ToteLifter();
 	~ToteLifter();
@@ -30,8 +30,10 @@ public:
 	CANTalon *getLeftMotor();
 	CANTalon *getRightMotor();
 
+	void setPID(double p, double i, double d);
 	Encoder *getEncoder();
 	PIDController *getPID();
+	float getPositionInches();
 
 	double getPosition();
 	bool closeEnough(float destination);
@@ -39,6 +41,8 @@ public:
 	 * For Manual Control
 	 */
 	void setMotorSpeed(double speed);
+
+	double getLastOutputValue();
 
 	/*
 	 * For PID Control

@@ -1,29 +1,24 @@
 #include <CANTalon.h>
-#include <DigitalInput.h>
 #include <Encoder.h>
 #include <PIDController.h>
 #include <SmartDashboard/SmartDashboard.h>
 #include <Subsystems/ToteLifter.h>
 
 ToteLifter::ToteLifter() :
-		Subsystem("ToteLifterino") {
+		Subsystem("ToteLifter") {
 	SAFE_INIT(TOTE_LIFTER_RIGHT_PORT,
 			rightMotor = new CANTalon(TOTE_LIFTER_RIGHT_PORT););
 	SAFE_INIT(TOTE_LIFTER_LEFT_PORT,
 			leftMotor = new CANTalon(TOTE_LIFTER_LEFT_PORT););
 
-	SAFE_INIT(TOTE_LIFTER_ELEVATOR_INPUT_PORT,
-			elevatorInput = new DigitalInput(TOTE_LIFTER_ELEVATOR_INPUT_PORT););
-	SAFE_INIT(TOTE_LIFTER_CRAAAW_INPUT_PORT,
-			craaawInput = new DigitalInput(TOTE_LIFTER_CRAAAW_INPUT_PORT););
-
 	encoder = new Encoder(TOTE_LIFTER_ENCODER_PORTS);
 
 	pid = new PIDController(TOTE_LIFTER_PID_P, TOTE_LIFTER_PID_I,
 	TOTE_LIFTER_PID_D, this, this);
-	pid->SetOutputRange(-0.8, 1.0);
-	pid->SetInputRange(0, TOTE_LIFTER_MAX_DISTANCE);
-	pid->SetPercentTolerance(.75);
+	pid->SetOutputRange(-.5, 1.0);
+	pid->SetInputRange(0, 50);
+	pid->Reset();
+	//pid->SetPercentTolerance(.75);
 	encoder->Reset();
 
 	dontUseMagOnPID = true; //topInput->Get() && botInput->Get();
@@ -32,21 +27,11 @@ ToteLifter::ToteLifter() :
 ToteLifter::~ToteLifter() {
 	delete rightMotor;
 	delete leftMotor;
-	delete craaawInput;
-	delete elevatorInput;
 	delete pid;
 	delete encoder;
 }
 
 void ToteLifter::InitDefaultCommand() {
-}
-
-bool ToteLifter::getElevatorInput() {
-	return !elevatorInput->Get();
-}
-
-bool ToteLifter::getCraaawInput() {
-	return !craaawInput->Get();
 }
 
 CANTalon *ToteLifter::getLeftMotor() {
@@ -69,6 +54,10 @@ PIDController *ToteLifter::getPID() {
 	return pid;
 }
 
+void ToteLifter::setPID(double p, double i, double d) {
+	pid->SetPID(p, i, d);
+}
+
 void ToteLifter::enablePID(bool enable) {
 	if (enable && !pid->IsEnabled()) {
 		pid->Enable();
@@ -76,6 +65,10 @@ void ToteLifter::enablePID(bool enable) {
 	if (!enable && pid->IsEnabled()) {
 		pid->Disable();
 	}
+}
+
+float ToteLifter::getPositionInches() {
+	return encoder->PIDGet() / TOTE_LIFTER_TICKS_PER_INCH;
 }
 
 void ToteLifter::setMotorSpeed(double speed) {
@@ -91,30 +84,30 @@ void ToteLifter::setMotorSpeed(double speed) {
 }
 
 void ToteLifter::setSetPoints(double setPoint) {
-	pid->SetSetpoint(setPoint);
+	if (setPoint >= 0) {
+		pid->SetSetpoint(setPoint);
+	}
 }
 
 bool ToteLifter::closeEnough(float destination) {
 	bool close = encoder->Get() < destination + TOTE_LIFTER_TOLERANCE
 			&& encoder->Get() > destination - TOTE_LIFTER_TOLERANCE;
 	SmartDashboard::PutBoolean("closeEnough", close);
-	return close;
+	return false;
+	//return close;
+}
+
+double ToteLifter::getLastOutputValue(){
+	return lastOutput;
 }
 
 void ToteLifter::PIDWrite(float f) {
-	if (!dontUseMagOnPID) {
-		if (getCraaawInput() && f > 0) {
-			f = 0;
-		}
-	} else {
-		SmartDashboard::PutString("LifterStatus", "Ignoring Input!");
-	}
-//	std::cout << "PIDWrite: " <<  f << std::endl;
-	leftMotor->Set(f);
-	rightMotor->Set(-f);
-	SmartDashboard::PutNumber("MotorValue", f);
+	leftMotor->Set(-f);
+	rightMotor->Set(f);
+	lastOutput = f;
 }
 
 double ToteLifter::PIDGet() {
-	return encoder->PIDGet();
+	return getPositionInches();
+	//return encoder->PIDGet();
 }
